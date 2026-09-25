@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Supplier - invenzu{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Add New Supplier</h1>
+    <p>Fill in supplier details.</p>
+  </div>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto; padding: 32px;">
+  <form method="POST" action="{{ url_for('add_supplier') }}">
+    <div class="form-group">
+      <label class="form-label">Supplier Name</label>
+      <input type="text" name="name" class="form-control" placeholder="Enter supplier name" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Phone Number</label>
+      <input type="text" name="phone" class="form-control" placeholder="Enter phone number" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-control" placeholder="Enter email" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Address</label>
+      <input type="text" name="address" class="form-control" placeholder="Enter address" required>
+    </div>
+
+    <div style="display: flex; gap: 14px; margin-top: 28px;">
+      <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px;">Add Supplier</button>
+      <button type="reset" class="btn btn-outline" style="min-width: 120px;">Reset</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

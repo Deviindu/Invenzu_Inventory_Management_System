@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Suppliers - invenzu{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Suppliers</h1>
+    <p>Manage your suppliers.</p>
+  </div>
+
+  <a href="{{ url_for('add_supplier') }}" class="btn btn-primary">
+    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+    <span>Add Supplier</span>
+  </a>
+</div>
+
+
+<!-- Search Input -->
+<form
+  method="GET"
+  action="{{ url_for('suppliers') }}"
+  style="
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+  "
+>
+  <div style="position: relative; max-width: 360px;">
+
+    <i
+      data-lucide="search"
+      style="
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        color: var(--text-muted);
+      "
+    ></i>
+
+    <input
+      type="text"
+      name="search"
+      value="{{ search }}"
+      placeholder="Search suppliers..."
+      class="form-control"
+      style="padding-left: 40px; border-radius: 20px;"
+    >
+
+  </div>
+</form>
+
+
+<!-- Suppliers Table -->
+<div
+  class="card"
+  style="padding: 0; overflow: hidden;"
+>
+
+  <div class="table-container">
+
+    <table>
+
+      <thead>
+          <tr>
+            <th>#</th>
+            <th>Supplier Name</th>
+            <th>Location</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Products</th>
+            <th>Actions</th>
+           </tr>
+      </thead>
+
+
+      <tbody>
+
+        {% for s in suppliers %}
+
+        <tr>
+
+          <!-- Number -->
+          <td>
+            {{ (current_page - 1) * per_page + loop.index }}
+          </td>
+
+          <!-- Supplier Name -->
+          <td style="color: #fff; font-weight: 600;">
+              {{ s.name }}
+          </td>
+
+          <!-- Location -->
+          <td>
+            {{ s.address or 'N/A' }}
+          </td>
+
+          <!-- Phone -->
+          <td>
+            {{ s.phone }}
+          </td>
+
+          <!-- Email -->
+          <td>
+            {{ s.email }}
+          </td>
+
+          <!-- Products Count -->
+          <td style="font-weight: 600;">
+             {{ s.products_count }}
+          </td>
+
+
+          <!-- Actions -->
+          <td>
+
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                align-items: center;
+              "
+            >
+
+              <!-- Edit -->
+              <a
+                href="{{ url_for('edit_supplier', id=s.id) }}"
+                style="color: #60a5fa;"
+                title="Edit"
+              >
+
+                <i
+                  data-lucide="edit-3"
+                  style="
+                    width: 16px;
+                    height: 16px;
+                  "
+                ></i>
+
+              </a>
+
+
+              <!-- Delete -->
+              <form
+                method="POST"
+                action="{{ url_for('delete_supplier', id=s.id) }}"
+                style="display: inline;"
+                onsubmit="return confirm('Are you sure you want to delete this supplier?');"
+              >
+
+                <button
+                  type="submit"
+                  style="
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    color: #f87171;
+                    cursor: pointer;
+                  "
+                  title="Delete"
+                >
+
+                  <i
+                    data-lucide="trash-2"
+                    style="
+                      width: 16px;
+                      height: 16px;
+                    "
+                  ></i>
+
+                </button>
+
+              </form>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+
+        {% else %}
+
+        <!-- Empty State -->
+        <tr>
+
+          <td
+            colspan="7"
+            style="
+              text-align: center;
+              padding: 40px;
+              color: var(--text-muted);
+            "
+          >
+            No suppliers found.
+          </td>
+
+        </tr>
+
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+<!-- Dynamic Footer -->
+<div
+  style="
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  "
+>
+
+  <span>
+    Showing
+    {% if total_suppliers > 0 %}
+      {{ ((current_page - 1) * per_page) + 1 }}
+      to
+      {{ [current_page * per_page, total_suppliers] | min }}
+    {% else %}
+      0 to 0
+    {% endif %}
+    of {{ total_suppliers }} suppliers
+  </span>
+
+  <div style="display: flex; gap: 6px;">
+
+    {% if current_page > 1 %}
+      <a
+        href="{{ url_for('suppliers', page=current_page - 1, search=search) }}"
+        style="
+          padding: 4px 10px;
+          background: rgba(255,255,255,0.05);
+          border-radius: 6px;
+          cursor: pointer;
+          color: inherit;
+          text-decoration: none;
+        "
+      >
+        &lt;
+      </a>
+    {% else %}
+      <span
+        style="
+          padding: 4px 10px;
+          background: rgba(255,255,255,0.03);
+          border-radius: 6px;
+          opacity: 0.4;
+        "
+      >
+        &lt;
+      </span>
+    {% endif %}
+
+
+    {% for page_num in range(1, total_pages + 1) %}
+
+      {% if page_num == current_page %}
+
+        <span
+          style="
+            padding: 4px 10px;
+            background: #3b82f6;
+            color: #fff;
+            border-radius: 6px;
+            font-weight: 600;
+          "
+        >
+          {{ page_num }}
+        </span>
+
+      {% else %}
+
+        <a
+          href="{{ url_for('suppliers', page=page_num, search=search) }}"
+          style="
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            cursor: pointer;
+            color: inherit;
+            text-decoration: none;
+          "
+        >
+          {{ page_num }}
+        </a>
+
+      {% endif %}
+
+    {% endfor %}
+
+
+    {% if current_page < total_pages %}
+
+      <a
+        href="{{ url_for('suppliers', page=current_page + 1, search=search) }}"
+        style="
+          padding: 4px 10px;
+          background: rgba(255,255,255,0.05);
+          border-radius: 6px;
+          cursor: pointer;
+          color: inherit;
+          text-decoration: none;
+        "
+      >
+        &gt;
+      </a>
+
+    {% else %}
+
+      <span
+        style="
+          padding: 4px 10px;
+          background: rgba(255,255,255,0.03);
+          border-radius: 6px;
+          opacity: 0.4;
+        "
+      >
+        &gt;
+      </span>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+</div>
+
+{% endblock %}

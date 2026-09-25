@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - invenzu{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Reports</h1>
+    <p>View inventory reports and analytics.</p>
+  </div>
+  <a href="{{ url_for('generate_report') }}" class="btn btn-primary">
+      <i class="fas fa-file-download"></i> Generate Report
+  </a>
+  
+</div>
+
+<!-- Mini Stats Grid -->
+<div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+  <div class="stat-card stat-blue">
+    <div class="stat-icon"><i data-lucide="package" style="width: 22px; height: 22px;"></i></div>
+    <div class="stat-info">
+      <p>Total Products</p>
+      <h3>{{ total_products }}</h3>
+    </div>
+  </div>
+
+  <div class="stat-card stat-green">
+    <div class="stat-icon"><i data-lucide="layers" style="width: 22px; height: 22px;"></i></div>
+    <div class="stat-info">
+      <p>Total Stock</p>
+      <h3>{{ "{:,}".format(total_stock) }}</h3>
+    </div>
+  </div>
+
+  <div class="stat-card stat-orange">
+    <div class="stat-icon"><i data-lucide="alert-triangle" style="width: 22px; height: 22px;"></i></div>
+    <div class="stat-info">
+      <p>Low Stock</p>
+      <h3>{{ low_stock }}</h3>
+    </div>
+  </div>
+
+  <div class="stat-card" style="border-color: rgba(239, 68, 68, 0.2);">
+    <div class="stat-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+      <i data-lucide="x-octagon" style="width: 22px; height: 22px;"></i>
+    </div>
+    <div class="stat-info">
+      <p>Out of Stock</p>
+      <h3 style="color: #f87171;">{{ out_of_stock }}</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Dual Bar Chart: Stock In vs Stock Out (Last 7 Days) -->
+<div class="card">
+  <div class="card-title">
+    <span>Stock In vs Stock Out (Last 7 Days)</span>
+    <div style="display: flex; gap: 16px; font-size: 0.8rem;">
+      <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: #06b6d4; border-radius: 2px;"></span>Stock In</span>
+      <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: #f43f5e; border-radius: 2px;"></span>Stock Out</span>
+    </div>
+  </div>
+
+  <div style="height: 320px; position: relative;">
+    <canvas
+      id="weeklyReportChart"
+      data-labels='{{ chart_labels | tojson }}'
+      data-stock-in='{{ chart_stock_in | tojson }}'
+      data-stock-out='{{ chart_stock_out | tojson }}'>
+    </canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const ctx = document.getElementById('weeklyReportChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: JSON.parse(document.getElementById('weeklyReportChart').dataset.labels),
+      datasets: [
+        {
+          label: 'Stock In',
+          data: JSON.parse(document.getElementById('weeklyReportChart').dataset.stockIn),
+          backgroundColor: '#06b6d4',
+          borderRadius: 4,
+          barPercentage: 0.6,
+          categoryPercentage: 0.7
+        },
+        {
+          label: 'Stock Out',
+          data: JSON.parse(document.getElementById('weeklyReportChart').dataset.stockOut),
+          backgroundColor: '#f43f5e',
+          borderRadius: 4,
+          barPercentage: 0.6,
+          categoryPercentage: 0.7
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#94a3b8'
+          },
+          grid: {
+            color: 'rgba(255,255,255,0.05)'
+          }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,851 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - invenzu
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+  <div>
+    <h1>Dashboard</h1>
+    <p>
+      Welcome back, {{ current_user_name }}!
+      Here's your inventory overview.
+    </p>
+  </div>
+
+
+ <form
+  method="GET"
+  action="{{ url_for('dashboard') }}"
+  style="
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--border-subtle);
+    padding: 8px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  "
+>
+  <i
+    data-lucide="calendar"
+    style="width: 16px; height: 16px; color: #60a5fa;"
+  ></i>
+
+  <input
+    type="date"
+    name="date"
+    value="{{ current_date.strftime('%Y-%m-%d') }}"
+    onchange="this.form.submit()"
+    style="
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #94a3b8;
+      color-scheme: dark;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+    "
+  >
+</form>
+</div>
+
+
+
+<!-- 5 STAT CARDS -->
+
+<div class="stats-grid">
+
+ <!-- TOTAL PRODUCTS -->
+<a
+  href="{{ url_for('products') }}"
+  style="text-decoration: none; color: inherit;"
+>
+  <div class="stat-card stat-blue">
+
+    <div class="stat-icon">
+      <i
+        data-lucide="package"
+        style="width: 24px; height: 24px;"
+      ></i>
+    </div>
+
+    <div class="stat-info">
+      <p>Total Products</p>
+      <h3>{{ total_products }}</h3>
+    </div>
+
+  </div>
+</a>
+
+
+ <!-- TOTAL STOCK -->
+<a
+  href="{{ url_for('products') }}"
+  style="text-decoration: none; color: inherit;"
+>
+  <div class="stat-card stat-green">
+
+    <div class="stat-icon">
+      <i
+        data-lucide="layers"
+        style="width: 24px; height: 24px;"
+      ></i>
+    </div>
+
+    <div class="stat-info">
+      <p>Total Stock</p>
+
+      <h3>
+        {{ "{:,}".format(total_stock) }}
+      </h3>
+    </div>
+
+  </div>
+</a>
+
+
+  <!-- LOW STOCK PRODUCTS -->
+<a
+  href="{{ url_for('products', status='Low Stock') }}"
+  style="text-decoration: none; color: inherit;"
+>
+  <div class="stat-card stat-orange">
+
+    <div class="stat-icon">
+      <i
+        data-lucide="alert-triangle"
+        style="width: 24px; height: 24px;"
+      ></i>
+    </div>
+
+    <div class="stat-info">
+      <p>Low Stock Products</p>
+      <h3>{{ low_stock }}</h3>
+    </div>
+
+  </div>
+</a>
+
+  <!-- OUT OF STOCK PRODUCTS -->
+<a
+  href="{{ url_for('products', status='Out of Stock') }}"
+  style="text-decoration: none; color: inherit;"
+>
+  <div class="stat-card stat-red">
+
+    <div class="stat-icon">
+      <i
+        data-lucide="package-x"
+        style="width: 24px; height: 24px;"
+      ></i>
+    </div>
+
+    <div class="stat-info">
+      <p>Out of Stock Products</p>
+      <h3>{{ out_of_stock }}</h3>
+    </div>
+
+  </div>
+</a>
+
+ <!-- SUPPLIERS -->
+<a
+  href="{{ url_for('suppliers') }}"
+  style="text-decoration: none; color: inherit;"
+>
+  <div class="stat-card stat-purple">
+
+    <div class="stat-icon">
+      <i
+        data-lucide="users"
+        style="width: 24px; height: 24px;"
+      ></i>
+    </div>
+
+    <div class="stat-info">
+      <p>Suppliers</p>
+      <h3>{{ total_suppliers }}</h3>
+    </div>
+
+  </div>
+</a>
+
+</div>
+
+  
+
+
+<!-- CHARTS ROW -->
+
+<div class="charts-grid">
+
+  <!-- STOCK OVERVIEW -->
+
+  <div class="card">
+
+    <div class="card-title">
+
+      <span>
+        Stock Overview
+      </span>
+
+      <div
+        style="
+          display: flex;
+          gap: 14px;
+          font-size: 0.78rem;
+        "
+      >
+
+        <span
+          style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          "
+        >
+
+          <span
+            style="
+              width: 8px;
+              height: 8px;
+              background: #06b6d4;
+              border-radius: 50%;
+            "
+          ></span>
+
+          In stock
+
+        </span>
+
+
+        <span
+          style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          "
+        >
+
+          <span
+            style="
+              width: 8px;
+              height: 8px;
+              background: #f43f5e;
+              border-radius: 50%;
+            "
+          ></span>
+
+          Out of stock 
+
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      style="
+        height: 220px;
+        position: relative;
+      "
+    >
+
+      <canvas id="stockOverviewChart"></canvas>
+
+    </div>
+
+  </div>
+
+
+  <!-- STOCK STATUS -->
+
+  <div class="card">
+
+    <div class="card-title">
+      <span>Stock Status</span>
+    </div>
+
+
+    <div
+      style="
+        height: 160px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+
+      <canvas id="stockStatusChart"></canvas>
+
+
+      <div
+        style="
+          position: absolute;
+          text-align: center;
+          pointer-events: none;
+        "
+      >
+
+        <div
+          style="
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+          "
+        >
+          {{ "{:,}".format(total_products) }}
+        </div>
+
+
+        <div
+          style="
+            font-size: 0.65rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+          "
+        >
+          Total Products
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      style="
+        display: flex;
+        justify-content: space-around;
+        margin-top: 14px;
+        font-size: 0.76rem;
+        border-top: 1px solid var(--border-subtle);
+        padding-top: 12px;
+      "
+    >
+
+      <span style="color: #34d399;">
+        ● In Stock
+      </span>
+
+      <span style="color: #fbbf24;">
+        ● Low Stock
+      </span>
+
+      <span style="color: #f87171;">
+        ● Out of Stock
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- BOTTOM ROW -->
+
+<div
+  style="
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+  "
+>
+
+
+  <!-- RECENT ACTIVITY -->
+
+  <div class="card">
+
+    <div class="card-title">
+
+      <span>
+        Recent Activity
+      </span>
+
+      <a
+        href="{{ url_for('reports') }}"
+        style="
+          font-size: 0.8rem;
+          color: #60a5fa;
+          text-decoration: none;
+        "
+      >
+        View All
+      </a>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>#</th>
+            <th>Product</th>
+            <th>Action</th>
+            <th>Quantity</th>
+            <th>Date</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          {% for row in recent_activity %}
+
+          <tr>
+
+            <td>
+              {{ loop.index }}
+            </td>
+
+            <td
+              style="
+                color: #fff;
+                font-weight: 500;
+              "
+            >
+              {{ row.product_name }}
+            </td>
+
+
+            <td>
+
+              <span
+                class="badge
+                {% if row.action_type == 'Stock In' %}
+                  badge-stock-in
+                {% else %}
+                  badge-stock-out
+                {% endif %}"
+              >
+                {{ row.action_type }}
+              </span>
+
+            </td>
+
+
+            {% if row.action_type == 'Stock In' %}
+
+            <td style="font-weight: 600; color: #34d399;">
+              +{{ row.quantity }}
+            </td>
+
+            {% else %}
+
+            <td style="font-weight: 600; color: #f87171;">
+              -{{ row.quantity }}
+            </td>
+
+            {% endif %}
+
+
+            <td>
+              {{ row.transaction_date }}
+            </td>
+
+          </tr>
+
+
+          {% else %}
+
+          <tr>
+
+            <td
+              colspan="5"
+              style="
+                text-align: center;
+                padding: 30px;
+                color: #64748b;
+              "
+            >
+              No recent activity
+            </td>
+
+          </tr>
+
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- LOW STOCK PRODUCTS -->
+
+  <div class="card">
+
+    <div class="card-title">
+
+      <span
+        style="
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #fbbf24;
+        "
+      >
+
+        <i
+          data-lucide="alert-triangle"
+          style="width: 18px; height: 18px;"
+        ></i>
+
+        Products Needing Restock
+
+      </span>
+
+
+      <a
+        href="{{ url_for('products', status='Low Stock') }}"
+        style="
+          font-size: 0.8rem;
+          color: #60a5fa;
+          text-decoration: none;
+        "
+      >
+        View
+      </a>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>#</th>
+            <th>Product</th>
+            <th>Stock</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          {% for p in low_stock_products %}
+
+          <tr>
+
+            <td>
+              {{ loop.index }}
+            </td>
+
+            <td
+              style="
+                color:#fff;
+                font-weight:500;
+              "
+            >
+              {{ p.name }}
+            </td>
+
+            <td>
+
+              <span class="badge badge-low-stock">
+                {{ p.quantity }}
+              </span>
+
+            </td>
+
+          </tr>
+
+
+          {% else %}
+
+          <tr>
+
+            <td
+              colspan="3"
+              style="
+                text-align: center;
+                padding: 30px;
+                color: #64748b;
+              "
+            >
+              No low stock products
+            </td>
+
+          </tr>
+
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<div
+  id="stockChartData"
+  data-labels='{{ chart_labels | tojson | forceescape }}'
+  data-stock-in='{{ chart_stock_in | tojson | forceescape }}'
+  data-stock-out='{{ chart_stock_out | tojson | forceescape }}'
+  data-status='{{ [current_in_stock, low_stock, current_out_stock] | tojson | forceescape }}'
+  style="display: none;"
+></div>
+
+
+<script>
+
+  // =====================================================
+  // STOCK OVERVIEW LINE CHART
+  // =====================================================
+
+  const stockOverviewElement =
+    document.getElementById('stockOverviewChart');
+
+
+  if (stockOverviewElement) {
+
+    const ctxLine =
+      stockOverviewElement.getContext('2d');
+
+
+    new Chart(ctxLine, {
+
+      type: 'line',
+
+      data: {
+
+        labels: JSON.parse(
+          document.getElementById('stockChartData').dataset.labels
+        ),
+
+        datasets: [
+
+          {
+
+            label: 'Total Stock',
+
+            data: JSON.parse(
+              document.getElementById('stockChartData').dataset.stockIn
+            ),
+
+            borderColor: '#06b6d4',
+
+            backgroundColor:
+              'rgba(6, 182, 212, 0.1)',
+
+            tension: 0.4,
+
+            fill: true,
+
+            pointRadius: 4,
+
+            pointBackgroundColor:
+              '#06b6d4'
+
+          },
+
+
+          {
+
+            label: 'Out of Stock Products',
+
+            data: JSON.parse(
+              document.getElementById('stockChartData').dataset.stockOut
+            ),
+
+            borderColor: '#f43f5e',
+
+            backgroundColor:
+              'rgba(244, 63, 94, 0.05)',
+
+            tension: 0.4,
+
+            fill: true,
+
+            pointRadius: 4,
+
+            pointBackgroundColor:
+              '#f43f5e'
+
+          }
+
+        ]
+
+      },
+
+
+      options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+          legend: {
+            display: false
+          }
+
+        },
+
+
+        scales: {
+
+          x: {
+
+            grid: {
+              color:
+                'rgba(255,255,255,0.05)'
+            },
+
+            ticks: {
+              color: '#64748b'
+            }
+
+          },
+
+
+          y: {
+
+            beginAtZero: true,
+
+            min: 0,
+
+            grid: {
+              color: 'rgba(255,255,255,0.05)'
+            },
+
+            ticks: {
+              color: '#64748b',
+              stepSize: 1
+            }
+
+          }
+
+        }
+
+      }
+
+    });
+
+  }
+
+
+  // =====================================================
+  // STOCK STATUS DOUGHNUT CHART
+  // =====================================================
+
+  const stockStatusElement =
+    document.getElementById('stockStatusChart');
+
+
+  if (stockStatusElement) {
+
+    const ctxDoughnut =
+      stockStatusElement.getContext('2d');
+
+
+    new Chart(ctxDoughnut, {
+
+      type: 'doughnut',
+
+      data: {
+
+        labels: [
+          'In Stock',
+          'Low Stock',
+          'Out of Stock'
+        ],
+
+        datasets: [{
+
+          data: JSON.parse(
+            document.getElementById('stockChartData').dataset.status
+          ),
+
+          backgroundColor: [
+            '#10b981',
+            '#f59e0b',
+            '#ef4444'
+          ],
+
+          borderWidth: 0,
+
+          hoverOffset: 4
+
+        }]
+
+      },
+
+
+      options: {
+
+        cutout: '76%',
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+          legend: {
+            display: false
+          },
+
+          tooltip: {
+
+            callbacks: {
+
+              label: function(context) {
+
+                const count = context.raw;
+
+                return context.label + ': ' +
+                  count +
+                  (count === 1 ? ' product' : ' products');
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    });
+
+  }
+
+</script>
+
+{% endblock %}

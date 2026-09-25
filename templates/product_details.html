@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Product Details - invenzu{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Product Details</h1>
+  </div>
+  <a href="{{ url_for('products') }}" class="btn btn-outline">
+    <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+    <span>Back to Products</span>
+  </a>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+  <div style="padding:8px;">
+   
+    <!-- Product Metadata -->
+    <div>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">{{ product.name }}</h2>
+        <span class="badge {% if product.status == 'In Stock' %}badge-in-stock{% else %}badge-low-stock{% endif %}">
+          {{ product.status }}
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.9rem;">
+        <div>
+          <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Category</span>
+          <strong style="color: #fff;">{{ product.category }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Brand</span>
+          <strong style="color: #fff;">{{ product.brand }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Quantity</span>
+          <strong style="color: #fff;">{{ product.quantity }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Price</span>
+          <strong style="color: #38bdf8;">₹{{ "{:,.0f}".format(product.price) }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Supplier</span>
+          <strong style="color: #fff;">{{ product.supplier_name or 'N/A' }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Date Added</span>
+          <strong style="color: #fff;">{{ product.created_at[:10] }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3 Counter Cards at Bottom -->
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+  <div class="stat-card stat-blue">
+    <div class="stat-icon">
+      <i data-lucide="package-plus" style="width: 24px; height: 24px;"></i>
+    </div>
+    <div class="stat-info">
+      <p>Stock In</p>
+      <h3>{{ stock_in }}</h3>
+    </div>
+  </div>
+
+  <div class="stat-card stat-orange">
+    <div class="stat-icon" style="background: rgba(244, 63, 94, 0.15); color: #fb7185;">
+      <i data-lucide="package-minus" style="width: 24px; height: 24px;"></i>
+    </div>
+    <div class="stat-info">
+      <p>Stock Out</p>
+      <h3>{{ stock_out }}</h3>
+    </div>
+  </div>
+
+  <div class="stat-card stat-green">
+    <div class="stat-icon">
+      <i data-lucide="check-circle-2" style="width: 24px; height: 24px;"></i>
+    </div>
+    <div class="stat-info">
+      <p>Current Stock</p>
+      <h3>{{ product.quantity }}</h3>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}invenzu - Manage Stock. Smarter.{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/invenzu-icon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Feather Icons or Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- Toast Flash Messages -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast toast-{{ 'success' if category == 'success' else 'error' }}">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;">✕</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-cube">
+          <i data-lucide="box" style="color: #fff; width: 22px; height: 22px;"></i>
+        </div>
+        <div class="logo-text">
+          <h2>invenzu</h2>
+          <p>Manage Stock. Smarter.</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+          <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('products') }}" class="nav-link {% if request.endpoint in ['products', 'add_product', 'edit_product', 'product_details'] %}active{% endif %}">
+          <i data-lucide="package" style="width: 18px; height: 18px;"></i>
+          <span>Products</span>
+        </a>
+        <a href="{{ url_for('suppliers') }}" class="nav-link {% if request.endpoint in ['suppliers', 'add_supplier'] %}active{% endif %}">
+          <i data-lucide="users" style="width: 18px; height: 18px;"></i>
+          <span>Suppliers</span>
+        </a>
+        <a href="{{ url_for('stock_in') }}" class="nav-link {% if request.endpoint == 'stock_in' %}active{% endif %}">
+          <i data-lucide="arrow-down-circle" style="width: 18px; height: 18px;"></i>
+          <span>Stock In</span>
+        </a>
+        <a href="{{ url_for('stock_out') }}" class="nav-link {% if request.endpoint == 'stock_out' %}active{% endif %}">
+          <i data-lucide="arrow-up-circle" style="width: 18px; height: 18px;"></i>
+          <span>Stock Out</span>
+        </a>
+        <a href="{{ url_for('reports') }}" class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}">
+          <i data-lucide="bar-chart-2" style="width: 18px; height: 18px;"></i>
+          <span>Reports</span>
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}">
+          <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+          <span>Profile</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn trigger-logout">
+          <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        
+
+        <div class="topbar-right" style="margin-left: auto;">
+          <div class="notification-wrapper">
+
+  <button type="button"
+          class="notification-bell"
+          id="notificationBell"
+          aria-label="Notifications">
+
+    <i data-lucide="bell" style="width: 19px; height: 19px;"></i>
+
+    {% if unread_notifications > 0 %}
+      <span class="badge-dot">{{ unread_notifications }}</span>
+    {% endif %}
+
+  </button>
+
+  <div class="notification-dropdown" id="notificationDropdown">
+
+    <div class="notification-header">
+      <div>
+        <strong>Notifications</strong>
+        <span>Low stock alerts</span>
+      </div>
+
+      <span class="notification-count">
+        {{ unread_notifications }}
+      </span>
+    </div>
+
+    {% if low_stock_notifications %}
+
+      {% for item in low_stock_notifications %}
+
+        <a href="{{ url_for('product_details', id=item.id) }}"
+           class="notification-item">
+
+          <div class="notification-icon">
+            <i data-lucide="alert-triangle"
+               style="width:18px;height:18px;"></i>
+          </div>
+
+          <div class="notification-content">
+            <div class="notification-title">
+              Low Stock
+            </div>
+
+            <div class="notification-text">
+              {{ item.name }} has only
+              <strong>{{ item.quantity }}</strong>
+              unit{% if item.quantity != 1 %}s{% endif %} remaining.
+            </div>
+          </div>
+
+        </a>
+
+      {% endfor %}
+
+    {% else %}
+
+      <div class="notification-empty">
+        <i data-lucide="check-circle"
+           style="width:22px;height:22px;"></i>
+
+        <p>No low-stock notifications.</p>
+      </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+          <a href="{{ url_for('profile') }}" class="user-profile-badge">
+            <div class="avatar-circle">{{ current_user_name[0] if current_user_name else 'I' }}</div>
+            <span style="font-size: 0.88rem; font-weight: 600;">{{ current_user_name }}</span>
+            <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+          </a>
+        </div>
+      </header>
+
+      <!-- Main Content Block -->
+      <main class="content-body">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal (Screen 16) -->
+  <div id="logout-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #f87171;">
+        <i data-lucide="log-out" style="width: 26px; height: 26px;"></i>
+      </div>
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">Are you sure you want to logout?</h3>
+      <p style="color: var(--text-muted); font-size: 0.88rem;">You will need to login again to access your account.</p>
+      
+      <div class="modal-actions">
+        <button id="cancel-logout" class="btn btn-outline" style="min-width: 110px;">Cancel</button>
+        <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-danger" style="min-width: 110px;">Logout</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

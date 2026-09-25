@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Product - invenzu{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Add New Product</h1>
+    <p>Fill in the product details below.</p>
+  </div>
+</div>
+
+<div class="card" style="max-width: 640px; margin: 0 auto; padding: 32px;">
+  <form method="POST" action="{{ url_for('add_product') }}">
+    <div class="form-group">
+      <label class="form-label">Product Name</label>
+      <input type="text" name="name" class="form-control" placeholder="Enter product name" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select name="category" class="form-control" required>
+        <option value="">Select category</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Furniture">Furniture</option>
+        <option value="Stationery">Stationery</option>
+        <option value="Hardware">Hardware</option>
+        <option value="Accessories">Accessories</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Brand</label>
+      <input type="text" name="brand" class="form-control" placeholder="Enter brand" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Quantity</label>
+      <input type="number" name="quantity" class="form-control" placeholder="Enter quantity" min="0" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Price (₹)</label>
+      <input type="number" step="1" name="price" class="form-control" placeholder="Enter price" min="0" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Supplier</label>
+      <select name="supplier_id" class="form-control" required>
+        <option value="">Select supplier</option>
+        {% for s in suppliers %}
+        <option value="{{ s.id }}">{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+
+    <div style="display: flex; gap: 14px; margin-top: 28px;">
+      <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px;">Add Product</button>
+      <button type="reset" class="btn btn-outline" style="min-width: 120px;">Reset</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

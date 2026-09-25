@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Report - Invenzu{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Inventory Report</h1>
+        <p>Complete inventory summary and product details.</p>
+    </div>
+
+    <button class="btn btn-primary" onclick="window.print()">
+        <i class="fas fa-print"></i> Print Report
+    </button>
+</div>
+
+
+<!-- Report Summary -->
+
+<div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+
+    <div class="stat-card stat-blue">
+        <div class="stat-icon">
+            <i data-lucide="package"></i>
+        </div>
+
+        <div class="stat-info">
+            <p>Total Products</p>
+            <h3>{{ total_products }}</h3>
+        </div>
+    </div>
+
+
+    <div class="stat-card stat-green">
+        <div class="stat-icon">
+            <i data-lucide="layers"></i>
+        </div>
+
+        <div class="stat-info">
+            <p>Total Stock</p>
+            <h3>{{ "{:,}".format(total_stock) }}</h3>
+        </div>
+    </div>
+
+
+    <div class="stat-card stat-orange">
+        <div class="stat-icon">
+            <i data-lucide="alert-triangle"></i>
+        </div>
+
+        <div class="stat-info">
+            <p>Low Stock</p>
+            <h3>{{ low_stock }}</h3>
+        </div>
+    </div>
+
+
+    <div class="stat-card"
+         style="border-color: rgba(239, 68, 68, 0.2);">
+
+        <div class="stat-icon"
+             style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+
+            <i data-lucide="x-octagon"></i>
+
+        </div>
+
+        <div class="stat-info">
+            <p>Out of Stock</p>
+
+            <h3 style="color: #f87171;">
+                {{ out_of_stock }}
+            </h3>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Report Information -->
+
+<div class="card" style="margin-bottom: 24px;">
+
+    <div class="card-title">
+        <span>Report Information</span>
+    </div>
+
+    <div style="
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding-top: 10px;
+        color: #94a3b8;
+    ">
+
+        <div>
+            <strong style="color: #e2e8f0;">
+                Report Type
+            </strong>
+
+            <br>
+
+            Inventory Summary
+        </div>
+
+
+        <div>
+            <strong style="color: #e2e8f0;">
+                Generated On
+            </strong>
+
+            <br>
+
+            {{ generated_date }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Product Report -->
+
+<div class="card">
+
+    <div class="card-title">
+        <span>Product Inventory</span>
+    </div>
+
+
+    <div style="overflow-x: auto;">
+
+        <table class="data-table">
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Supplier</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for product in products %}
+
+                <tr>
+
+                    <td>
+                        {{ product['id'] }}
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            {{ product['name'] }}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        {{ product['quantity'] }}
+                    </td>
+
+
+                    <td>
+                        ₹{{ "{:,.2f}".format(product['price']) }}
+                    </td>
+
+
+                    <td>
+                        {{ product['supplier_name'] or 'N/A' }}
+                    </td>
+
+
+                    <td>
+
+                        {% if product['quantity'] == 0 %}
+
+                            <span style="
+                                color: #f87171;
+                                font-weight: 600;
+                            ">
+                                Out of Stock
+                            </span>
+
+                        {% elif product['quantity'] <= 5 %}
+
+                            <span style="
+                                color: #fbbf24;
+                                font-weight: 600;
+                            ">
+                                Low Stock
+                            </span>
+
+                        {% else %}
+
+                            <span style="
+                                color: #34d399;
+                                font-weight: 600;
+                            ">
+                                In Stock
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="6"
+                        style="
+                            text-align: center;
+                            padding: 40px;
+                            color: #94a3b8;
+                        ">
+
+                        No products found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+</script>
+
+<style>
+
+@media print {
+
+    .sidebar,
+    .navbar,
+    .page-header button {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+}
+
+</style>
+
+{% endblock %}

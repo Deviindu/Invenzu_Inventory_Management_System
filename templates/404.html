@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 Page Not Found - invenzu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .not-found-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+                  #070b16;
+    }
+  </style>
+</head>
+<body class="not-found-container">
+  <div class="card" style="max-width: 520px; width: 100%; padding: 48px 32px; border-radius: 20px;">
+    <!-- 404 Header -->
+    <h1 style="font-size: 5rem; font-weight: 800; line-height: 1; background: linear-gradient(135deg, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;">
+      404
+    </h1>
+    <h2 style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Page Not Found</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px;">
+      The page you are looking for doesn't exist.
+    </p>
+
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="padding: 12px 28px; font-size: 0.95rem; border-radius: 10px;">
+      Go to Dashboard
+    </a>
+  </div>
+
+  <!-- Decorative Isometric Art Box (matching bottom right banner in screenshot) -->
+  <div style="margin-top: 40px; display: flex; align-items: center; gap: 24px; background: rgba(15, 23, 42, 0.6); padding: 18px 28px; border-radius: 16px; border: 1px solid var(--border-subtle);">
+    <svg viewBox="0 0 120 70" style="width: 80px; height: 50px;">
+      <!-- Cube 1 -->
+      <polygon points="30,10 50,20 30,30 10,20" fill="#60a5fa" />
+      <polygon points="10,20 30,30 30,50 10,40" fill="#2563eb" />
+      <polygon points="30,30 50,20 50,40 30,50" fill="#1d4ed8" />
+      <!-- Cube 2 -->
+      <polygon points="70,15 90,25 70,35 50,25" fill="#a855f7" />
+      <polygon points="50,25 70,35 70,55 50,45" fill="#7e22ce" />
+      <polygon points="70,35 90,25 90,45 70,55" fill="#6b21a8" />
+    </svg>
+    <div style="text-align: left;">
+      <h4 style="font-size: 1.1rem; font-weight: 700; color: #fff;">Better Inventory</h4>
+      <p style="color: #38bdf8; font-size: 0.82rem; font-weight: 600;">A Brighter Tomorrow</p>
+    </div>
+  </div>
+</body>
+</html>
